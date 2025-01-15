@@ -1,85 +1,25 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import Label from "./Label";
-import ItemSelected from "./ItemSelected";
-import SearchField from "./SearchField";
-import OptionItem from "./OptionItem";
-
-const defaultItems = [
-  "Line Chart",
-  "Area Chart",
-  "Column Chart",
-  "Bar Chart",
-  "Pie Chart",
-  "Scatter Chart",
-  "Bubble Chart",
-];
+import { useItemStore } from "../stores/itemStore";
+import Options from "./Options";
+import MainBar from "./MainBar";
 
 function App() {
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [searchItems, setSearchItems] = useState(defaultItems);
-  const [text, setText] = useState("");
-
-  const inputElement = useRef<HTMLInputElement>(null);
-
-  function showChar(e: KeyboardEvent) {
-    if (e.key === "a" && e.ctrlKey === true) {
-      const filteredItems = defaultItems.filter(
-        (item) => !selectedItems.includes(item)
-      );
-      setSelectedItems([...selectedItems, ...filteredItems]);
-      inputElement.current?.focus();
-    }
-  }
+  const charControl = useItemStore((state) => state.showChar);
 
   useEffect(() => {
-    document.addEventListener("keydown", showChar);
+    document.addEventListener("keydown", charControl);
     return () => {
-      document.removeEventListener("keydown", showChar);
+      document.removeEventListener("keydown", charControl);
     };
   });
 
   return (
-    <>
-      <div className="max-w-[600px] mx-auto mt-12">
-        <Label />
-        <div className=" border border-gray-300 rounded-md flex flex-row flex-wrap items-center px-1 pt-1 mb-2 min-h-9 text-sm h-full">
-          {selectedItems.map((item) => {
-            return (
-              <ItemSelected
-                key={`selected-${item}`}
-                selectedItems={selectedItems}
-                setSelectedItems={setSelectedItems}
-                item={item}
-              />
-            );
-          })}
-          <SearchField
-            text={text}
-            setText={setText}
-            setSearchItems={setSearchItems}
-            defaultItems={defaultItems}
-          />
-        </div>
-
-        <section className="chartOptions border border-gray-300 rounded-sm shadow-md">
-          <ul className="text-sm">
-            {searchItems.map((item) => {
-              return (
-                <OptionItem
-                  key={`option-${item}`}
-                  item={item}
-                  selectedItems={selectedItems}
-                  setSelectedItems={setSelectedItems}
-                  setText={setText}
-                  setSearchItems={setSearchItems}
-                  defaultItems={defaultItems}
-                />
-              );
-            })}
-          </ul>
-        </section>
-      </div>
-    </>
+    <div className="max-w-[600px] mx-auto mt-12">
+      <Label />
+      <MainBar />
+      <Options />
+    </div>
   );
 }
 
